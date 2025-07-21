@@ -1,4 +1,4 @@
--- Create Database
+-- Database
 CREATE DATABASE IF NOT EXISTS expense_monitoring;
 USE expense_monitoring;
 
@@ -76,8 +76,6 @@ CREATE PROCEDURE AddExpense(
 BEGIN
     INSERT INTO expenses (user_id, category_id, amount, description, expense_date, receipt_id)
     VALUES (p_user_id, p_category_id, p_amount, p_description, p_expense_date, p_receipt_id);
-
-    SELECT LAST_INSERT_ID() as expense_id;
 END //
 DELIMITER ;
 
@@ -115,8 +113,6 @@ BEGIN
         category_id = p_category_id,
         expense_date = p_expense_date
     WHERE expense_id = p_expense_id;
-
-    SELECT ROW_COUNT() as affected_rows;
 END //
 DELIMITER ;
 
@@ -125,10 +121,10 @@ DELIMITER //
 CREATE PROCEDURE DeleteExpense(IN p_expense_id INT)
 BEGIN
     DELETE FROM expenses WHERE expense_id = p_expense_id;
-    SELECT ROW_COUNT() as affected_rows;
 END //
 DELIMITER ;
 
+-- Monthly total expenses per category
 DELIMITER //
 CREATE PROCEDURE GetMonthlyExpensesByCategory(
     IN p_user_id INT,
@@ -138,57 +134,13 @@ CREATE PROCEDURE GetMonthlyExpensesByCategory(
 BEGIN
     SELECT 
         c.category_name,
-        COUNT(e.expense_id) as transaction_count,
-        SUM(e.amount) as total_amount,
-        AVG(e.amount) as average_amount,
-        MIN(e.amount) as min_amount,
-        MAX(e.amount) as max_amount
+        SUM(e.amount) as total_amount
     FROM expenses e
     JOIN categories c ON e.category_id = c.category_id
     WHERE e.user_id = p_user_id
-    AND YEAR(e.expense_date) = p_year
-    AND MONTH(e.expense_date) = p_month
+      AND YEAR(e.expense_date) = p_year
+      AND MONTH(e.expense_date) = p_month
     GROUP BY c.category_id, c.category_name
     ORDER BY total_amount DESC;
 END //
 DELIMITER ;
-
--- Get monthly summary for all users
-CREATE VIEW monthly_expense_summary AS
-SELECT 
-    u.username,
-    YEAR(e.expense_date) as year,
-    MONTH(e.expense_date) as month,
-    COUNT(e.expense_id) as total_transactions,
-    SUM(e.amount) as total_spent,
-    AVG(e.amount) as avg_transaction
-FROM expenses e
-JOIN users u ON e.user_id = u.user_id
-GROUP BY u.user_id, YEAR(e.expense_date), MONTH(e.expense_date)
-ORDER BY year DESC, month DESC;
-
--- Get top spending categories
-CREATE VIEW top_categories AS
-SELECT 
-    c.category_name,
-    COUNT(e.expense_id) as transaction_count,
-    SUM(e.amount) as total_amount
-FROM expenses e
-JOIN categories c ON e.category_id = c.category_id
-GROUP BY c.category_id, c.category_name
-ORDER BY total_amount DESC;
-
--- Test CRUD operations
-CALL AddExpense(1, 1, 250.00, 'Coffee at CCD', '2024-01-28', 'receipt_008');
-CALL GetUserExpenses(1);
-CALL UpdateExpense(1, 500.00, 'Updated: Grocery shopping at Big Bazaar', 1, '2024-01-15');
-CALL GetMonthlyExpensesByCategory(1, 2024, 1);
-
--- View summaries
-SELECT * FROM monthly_expense_summary;
-SELECT * FROM top_categories;
-
--- Indexes
-CREATE INDEX idx_user_date ON expenses(user_id, expense_date);
-CREATE INDEX idx_category_date ON expenses(category_id, expense_date);
-CREATE INDEX idx_amount ON expenses(amount);
