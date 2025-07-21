@@ -1,26 +1,26 @@
-use expense_monitoring;
+// Use the correct database
+use("expense_monitoring");
 
-
-// Insert sample receipts
+// Insert all sample receipts
 db.receipts.insertMany([
   {
     receipt_id: "receipt_001",
     user_id: 1,
-    note: "Grocery shopping at Big Bazaar",
+    note: "Grocery shopping at Walmart",
     image_url: "https://example.com/receipts/001.jpg",
     uploaded_at: new Date("2024-01-15T10:00:00Z")
   },
   {
     receipt_id: "receipt_002",
     user_id: 1,
-    note: "Fuel from Indian Oil petrol bunk",
+    note: "Gas station fill-up",
     image_url: "https://example.com/receipts/002.jpg",
     uploaded_at: new Date("2024-01-16T12:00:00Z")
   },
   {
     receipt_id: "receipt_003",
     user_id: 2,
-    note: "Dinner at Barbeque Nation",
+    note: "Dinner at restaurant",
     image_url: "https://example.com/receipts/003.jpg",
     uploaded_at: new Date("2024-01-18T20:00:00Z")
   },
@@ -61,7 +61,7 @@ db.receipts.insertMany([
   }
 ]);
 
-// Indexing for performance and fast lookup
-db.receipts.createIndex({ user_id: 1 });            
-db.receipts.createIndex({ uploaded_at: -1 });      
-db.receipts.createIndex({ receipt_id: 1 }, { unique: true }); 
+// Create indexes
+db.receipts.createIndex({ user_id: 1 });
+db.receipts.createIndex({ uploaded_at: -1 });
+db.receipts.createIndex({ receipt_id: 1 }, { unique: true });
