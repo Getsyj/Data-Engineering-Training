@@ -114,7 +114,7 @@ WHERE mood = 'Tired' AND duration_min > 30;
 -- 10
 UPDATE WorkoutLog
 SET mood = 'Normal'
-WHERE log_id = 2; -- adjust log_id if needed
+WHERE log_id = 2; 
 
 -- 11
 UPDATE Exercises
