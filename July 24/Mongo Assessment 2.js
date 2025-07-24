@@ -1,7 +1,6 @@
 use lib;
 
 // Insert Collections
-
 // Books
 db.books.insertMany([
   { book_id: 201, title: "The Alchemist", author: "Paulo Coelho", genre: "Fiction", copies: 10 },
