@@ -1,4 +1,4 @@
--- Create and use DB
+-- Create DB
 CREATE DATABASE IF NOT EXISTS personal_fitness_tracker;
 USE personal_fitness_tracker;
 
